@@ -8,11 +8,7 @@
  */
 
 jQuery(function($){
-  $('body').on('click', '[data-off-click]', function(e) {
-    e.preventDefault();
-  });
-
-  // data-target required, for ex:
+  // jQuery.data-actions (data-target required), for ex:
   // <p data-target="this" data-class-toggle="fixed"> <span data-target="modal" data-action="fadeToggle"> button </span> </p>
   $('body').on('click', '[data-target]', function(event) {
     var target = $(this).attr('data-target');
