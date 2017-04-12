@@ -24,56 +24,75 @@ jQuery(function($){
       }
     }
   }
+  function doAction($obj, target, trigger){
+    $obj.on(trigger, function(event) {
 
-  $('[data-target]').each(function(index, el) {
-    $this = $(this);
-    var trigger     = $this.attr('data-trigger');
-    var target      = $this.attr('data-target');
-    var action      = $this.attr('data-action');
-    var loadAction  = $this.attr('data-load-action');
-    var allowClick  = $this.attr('data-allow-click');
-    var allowChilds = $this.attr('data-childs');
+      // var allowChilds = $this.data('childs');
+      var allowClick  = $(this).data('allow-click');
+      var action  = $(this).data('action');
+      console.log( target );
 
-    if( ! trigger ) trigger = 'click';
-    var actionTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
+      var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
+      // console.log(evalTarget);
 
-    if( loadAction )
-      eval( '$( ' + actionTarget + ' ).' + action + '();' );
-
-    $(this).on(trigger, function(event) {
-      if( ! allowChilds && e.target !== this )
-        return;
-
+      // if( ! allowChilds && event.target !== this )
+      //   return;
       if( ! allowClick && trigger == 'click' )
         event.preventDefault();
 
-      var $target = $(target);
-
-      var toggleClass = $(this).attr('data-toggle-class');
-      if( toggleClass )
-        $target.toggleClass(toggleClass);
-      
       if( action )
-        eval( '$( ' + actionTarget + ' ).' + action + '();' );
+        eval( '$( ' + evalTarget + ' ).' + action + '();' );
 
-      var textReplace = $(this).attr('data-text-replace');
-      var textReplaceTo = $(this).attr('data-text-replace-to');
-      
-      if( textReplace && textReplaceTo ){
-        if( ! $(this).attr('data-text-replaced') ){
-          replaceTextOnly($target, textReplace, textReplaceTo);
-          $target.attr('data-text-replaced', 'true');
-        }
-        else {
-          replaceTextOnly($target, textReplaceTo, textReplace);
-          $(this).removeAttr('data-text-replaced');
-        }
-      }
-
-      else if( textReplace ){
-        $(this).attr('data-text-replace', $target.text());
-        $target.text( textReplace );
-      }
+      // console.log( event );
     });
+  }
+  $('[data-target]').each(function(index, el) {
+    $this = $(el);
+    var action  = $this.data('action');
+    var target  = $this.data('target');
+    var trigger = $this.data('trigger');
+    if( ! trigger ) trigger = 'click';
+    
+    if( action ){
+
+      doAction( $(this), target, trigger );
+
+    }
+    else {
+
+      $(this).children('[data-action]').each(function(){
+        doAction( $(this), target, trigger );
+      });
+
+    }
+   
+
+    // $(this).on(trigger, function(event) {
+
+    //   var toggleClass = $(this).attr('data-toggle-class');
+    //   if( toggleClass )
+    //     $target.toggleClass(toggleClass);
+      
+    //   var textReplace = $(this).attr('data-text-replace');
+    //   var textReplaceTo = $(this).attr('data-text-replace-to');
+      
+    //   if( textReplace && textReplaceTo ){
+    //     if( ! $(this).attr('data-text-replaced') ){
+    //       replaceTextOnly($(this), textReplace, textReplaceTo);
+    //       $(this).attr('data-text-replaced', 'true');
+    //     }
+    //     else {
+    //       replaceTextOnly($(this), textReplaceTo, textReplace);
+    //       $(this).removeAttr('data-text-replaced');
+    //     }
+    //   }
+
+    //   else if( textReplace ){
+    //     var text = $(this).text();
+    //     $(this).attr('data-text-replace', text);
+    //     $(this).text( textReplace );
+    //   }
+
+    // });
   });
 });
