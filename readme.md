@@ -15,7 +15,8 @@
 props :
 - data-target
 - data-trigger
-- data-action
 - data-load-action
+- data-class-toggle
+- data-action
 - textReplace
 - textReplaceTo
