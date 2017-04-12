@@ -4,7 +4,7 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 0.4a
+ * Version: 0.5a
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -26,11 +26,13 @@ jQuery(function($){
   }
 
   $('[data-target]').each(function(index, el) {
-    var trigger    = $(this).attr('data-trigger');
-    var target     = $(this).attr('data-target');
-    var action     = $(this).attr('data-action');
-    var loadAction = $(this).attr('data-load-action');
-    var allowClick = $(this).attr('data-allow-click');
+    $this = $(this);
+    var trigger     = $this.attr('data-trigger');
+    var target      = $this.attr('data-target');
+    var action      = $this.attr('data-action');
+    var loadAction  = $this.attr('data-load-action');
+    var allowClick  = $this.attr('data-allow-click');
+    var allowChilds = $this.attr('data-childs');
 
     if( ! trigger ) trigger = 'click';
     var actionTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
@@ -39,9 +41,13 @@ jQuery(function($){
       eval( '$( ' + actionTarget + ' ).' + action + '();' );
 
     $(this).on(trigger, function(event) {
-      var $target = $(target);
+      if( ! allowChilds && e.target !== this )
+        return;
+
       if( ! allowClick && trigger == 'click' )
         event.preventDefault();
+
+      var $target = $(target);
 
       var toggleClass = $(this).attr('data-toggle-class');
       if( toggleClass )
