@@ -4,7 +4,7 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 0.3a
+ * Version: 0.4a
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -26,10 +26,11 @@ jQuery(function($){
   }
 
   $('[data-target]').each(function(index, el) {
-    var trigger = $(this).attr('data-trigger');
-    var target = $(this).attr('data-target');
-    var action = $(this).attr('data-action');
+    var trigger    = $(this).attr('data-trigger');
+    var target     = $(this).attr('data-target');
+    var action     = $(this).attr('data-action');
     var loadAction = $(this).attr('data-load-action');
+    var allowClick = $(this).attr('data-allow-click');
 
     if( ! trigger ) trigger = 'click';
     var actionTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
@@ -39,11 +40,12 @@ jQuery(function($){
 
     $(this).on(trigger, function(event) {
       var $target = $(target);
+      if( ! allowClick && trigger == 'click' )
+        event.preventDefault();
 
       var toggleClass = $(this).attr('data-toggle-class');
-      if( toggleClass ){
+      if( toggleClass )
         $target.toggleClass(toggleClass);
-      }
       
       if( action )
         eval( '$( ' + actionTarget + ' ).' + action + '();' );
