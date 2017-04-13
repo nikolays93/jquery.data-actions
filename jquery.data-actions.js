@@ -4,7 +4,7 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 0.5a
+ * Version: 1.0b
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -24,28 +24,36 @@ jQuery(function($){
       }
     }
   }
+
   function doAction($obj, target, trigger){
+    var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
+    var loadAction = $obj.data('load-action');
+    var props = $obj.data('props');
+
+    if( loadAction )
+      eval( '$( ' + evalTarget + ' ).' + loadAction + '(' + props + ');' );
+
     $obj.on(trigger, function(event) {
 
-      // var allowChilds = $this.data('childs');
+      var toggleClass = $(this).attr('data-toggle-class');
+      if( toggleClass )
+        $(target).toggleClass(toggleClass);
+      
+      var wrap = $(this).data('wrapper');
+      if( wrap && event.target !== this )
+        return;
+
       var allowClick  = $(this).data('allow-click');
-      var action  = $(this).data('action');
-      console.log( target );
-
-      var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
-      // console.log(evalTarget);
-
-      // if( ! allowChilds && event.target !== this )
-      //   return;
       if( ! allowClick && trigger == 'click' )
         event.preventDefault();
 
+      var props = $obj.data('props');
+      var action  = $(this).data('action');
       if( action )
-        eval( '$( ' + evalTarget + ' ).' + action + '();' );
-
-      // console.log( event );
+        eval( '$( ' + evalTarget + ' ).' + action + '(' + props + ');' );
     });
   }
+
   $('[data-target]').each(function(index, el) {
     $this = $(el);
     var action  = $this.data('action');
@@ -53,46 +61,50 @@ jQuery(function($){
     var trigger = $this.data('trigger');
     if( ! trigger ) trigger = 'click';
     
-    if( action ){
-
+    doAction( $(this), target, trigger );
+    $(this).children('[data-action]').each(function(){
       doAction( $(this), target, trigger );
+    });
 
+  });
+  function textRepalce( $obj ){
+    $wasObj = $obj;
+    var textReplace = $obj.attr('data-text-replace');
+    var textReplaceTo = $obj.attr('data-text-replace-to');
+    var target  = $obj.data('target');
+
+    if( target )
+      $obj = $( target )
+
+    if( textReplace && textReplaceTo ){
+      if( ! $obj.attr('data-text-replaced') ){
+        replaceTextOnly($obj, textReplace, textReplaceTo);
+        $obj.attr('data-text-replaced', 'true');
+      }
+      else {
+        replaceTextOnly($obj, textReplaceTo, textReplace);
+        $obj.removeAttr('data-text-replaced');
+      }
     }
     else {
-
-      $(this).children('[data-action]').each(function(){
-        doAction( $(this), target, trigger );
-      });
-
+      var text = $obj.text();
+      $wasObj.attr('data-text-replace', text);
+      $obj.text( textReplace );
     }
-   
-
-    // $(this).on(trigger, function(event) {
-
-    //   var toggleClass = $(this).attr('data-toggle-class');
-    //   if( toggleClass )
-    //     $target.toggleClass(toggleClass);
-      
-    //   var textReplace = $(this).attr('data-text-replace');
-    //   var textReplaceTo = $(this).attr('data-text-replace-to');
-      
-    //   if( textReplace && textReplaceTo ){
-    //     if( ! $(this).attr('data-text-replaced') ){
-    //       replaceTextOnly($(this), textReplace, textReplaceTo);
-    //       $(this).attr('data-text-replaced', 'true');
-    //     }
-    //     else {
-    //       replaceTextOnly($(this), textReplaceTo, textReplace);
-    //       $(this).removeAttr('data-text-replaced');
-    //     }
-    //   }
-
-    //   else if( textReplace ){
-    //     var text = $(this).text();
-    //     $(this).attr('data-text-replace', text);
-    //     $(this).text( textReplace );
-    //   }
-
-    // });
+  }
+  
+  $('[data-text-replace]').each(function(index, el) {
+    var trigger = $(this).data('trigger');
+    if( ! trigger ) trigger = 'click';
+    
+    if( trigger == 'load' ){
+      textRepalce( $(this) );
+    }
+    else {
+      $(this).on(trigger, function(){
+        textRepalce( $(this) );
+      });
+    }
   });
+  
 });
