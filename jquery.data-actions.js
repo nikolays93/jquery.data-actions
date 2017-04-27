@@ -71,18 +71,29 @@ jQuery(function($){
     });
   });
 
-  var easyActions = ['hide', 'show', 'fade-In', 'fade-Out', 'slide-Up', 'slide-Down'];
+  var easyActions = ['hide', 'show', 'fade-Out', 'fade-In', 'slide-Up', 'slide-Down'];
   easyActions.forEach(function(item, i, arr) {
     $('[data-' + item + ']').each(function(index, el) {
-      doLoadAction( $(this), $(this).data(item), item.replace('-', '') );
-
       var action = item.split('-');
       if(action[0] == 'hide' || action[0] == 'show')
         action = 'toggle';
       else
         action = action[0] + 'Toggle';
 
-      doAction( $(this), $(this).data(item), 'change', action );      
+      doAction( $(this), $(this).data(item), 'change', action );
+
+      action = item.replace('-', '');
+
+      if( $(this).attr('type') == 'checkbox' && !$(this).is(':checked')){
+        if( ['show', 'fadeIn', 'slideDown'].includes(action) ){
+          action = action.replace('show', 'hide').replace('In', 'Out').replace('Down', 'Up');
+        }
+        else{
+          action = action.replace('hide', 'show').replace('Out', 'In').replace('Up', 'Down');
+        }
+      }
+      
+      doLoadAction( $(this), $(this).data(item), action );
     });
   });
 

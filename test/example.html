@@ -11,6 +11,7 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
+	<!-- display after load 'couse Ease Fade Action is checked -->
 	<div style="display: none;" id="stuntman" data-trigger="load" data-text-replace="away" data-text-replace-to="ready"> I'm away </div>
 	
 	<!-- group actions -->
@@ -38,8 +39,10 @@
 
 	<!-- Ease Load&Toggle Action -->
 	<div>
-		<input type="checkbox" name="" data-fade-In="#stuntman">
-		Ease Fade Action
+		<label>
+			<input type="checkbox" name="" data-fade-In="#stuntman" checked='true'>
+			Ease Fade Action
+		</label>
 	</div>
 	<hr>
 
