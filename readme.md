@@ -6,21 +6,29 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 1.0 beta
+ * Version: 1.1 beta
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 ```
 
 props :
-- data-target
-- data-trigger
-- data-load-action
-- data-class-toggle
-- data-action
+- target
+- trigger
+- load
+- class-toggle
+- action
 - textReplace
 - textReplaceTo
 
+load & toggle : 
+- hide
+- show
+- fade-In
+- fade-Out
+- slide-In
+- slide-Out
+
 allows:
 - allowClick
-- allowChilds
+- data-wrapper

@@ -4,7 +4,7 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 1.0b
+ * Version: 1.1b
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -25,17 +25,20 @@ jQuery(function($){
     }
   }
 
-  function doAction($obj, target, trigger){
+  function doLoadAction($obj, target, action){
     var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
-    var loadAction = $obj.data('load-action');
     var props = $obj.data('props');
+    eval( '$( ' + evalTarget + ' ).' + action + '(' + props + ');' );
+  }
 
+  function doAction($obj, target, trigger, action = false){
+    var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
+    var loadAction = (trigger == 'load') ? action : $obj.data('load');
     if( loadAction )
-      eval( '$( ' + evalTarget + ' ).' + loadAction + '(' + props + ');' );
+      doLoadAction($obj, target, loadAction);
 
     $obj.on(trigger, function(event) {
-
-      var toggleClass = $(this).attr('data-toggle-class');
+      var toggleClass = $(this).data('toggle-class');
       if( toggleClass )
         $(target).toggleClass(toggleClass);
       
@@ -47,8 +50,10 @@ jQuery(function($){
       if( ! allowClick && trigger == 'click' )
         event.preventDefault();
 
+      if(!action)
+        action = $obj.data('action');
+
       var props = $obj.data('props');
-      var action  = $(this).data('action');
       if( action )
         eval( '$( ' + evalTarget + ' ).' + action + '(' + props + ');' );
     });
@@ -56,17 +61,31 @@ jQuery(function($){
 
   $('[data-target]').each(function(index, el) {
     $this = $(el);
-    var action  = $this.data('action');
     var target  = $this.data('target');
     var trigger = $this.data('trigger');
     if( ! trigger ) trigger = 'click';
     
-    doAction( $(this), target, trigger );
+    doAction( $this, target, trigger );
     $(this).children('[data-action]').each(function(){
       doAction( $(this), target, trigger );
     });
-
   });
+
+  var easyActions = ['hide', 'show', 'fade-In', 'fade-Out', 'slide-Up', 'slide-Down'];
+  easyActions.forEach(function(item, i, arr) {
+    $('[data-' + item + ']').each(function(index, el) {
+      doLoadAction( $(this), $(this).data(item), item.replace('-', '') );
+
+      var action = item.split('-');
+      if(action[0] == 'hide' || action[0] == 'show')
+        action = 'toggle';
+      else
+        action = action[0] + 'Toggle';
+
+      doAction( $(this), $(this).data(item), 'change', action );      
+    });
+  });
+
   function textRepalce( $obj ){
     $wasObj = $obj;
     var textReplace = $obj.attr('data-text-replace');

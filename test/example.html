@@ -11,22 +11,37 @@
 <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-	<div id="stuntman" data-trigger="load" data-text-replace="away" data-text-replace-to="ready"> I'm away </div>
+	<div style="display: none;" id="stuntman" data-trigger="load" data-text-replace="away" data-text-replace-to="ready"> I'm away </div>
 	
+	<!-- group actions -->
 	<div id="wrap" data-target="#stuntman" data-action="slideToggle" data-wrapper="only">
 		Click on wrapper
 		<div id="inside" data-text-replace="I said: NO CLICK!"> NO CLICK </div>
 		<div id="inside2" data-action="fadeToggle"> Click Me Please! </div>
 	</div>
 	<hr>
+
+	<!-- simple action -->
 	<div data-target="#stuntman" data-action="slideToggle">Slide Stuntman Now!</div><br><br>
 	<div data-target="#stuntman" data-action="fadeToggle">Fade Stuntman Now!</div><br><br>
+	<hr>
 
+	<!-- text replace -->
 	<div data-target="#stuntman" data-text-replace="I'm away again." data-toggle-class="away">
 		<p data-text-replace="lets go away" data-text-replace-to="come on!">stuntman, lets go away!</p>
 	</div><br>
 	<hr>
+
+	<!-- action with props -->
 	<div data-target="#stuntman" data-action="animate" data-props="{left:'45%', top: '60px'}"> Pull him. </div>
+	<hr>
+
+	<!-- Ease Load&Toggle Action -->
+	<div>
+		<input type="checkbox" name="" data-fade-In="#stuntman">
+		Ease Fade Action
+	</div>
+	<hr>
 
 	<script type="text/javascript" src="../jquery.data-actions.js"></script>
 </body>
