@@ -4,7 +4,7 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 1.1b
+ * Version: 1.2b
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -76,11 +76,16 @@ jQuery(function($){
   var easyActions = ['hide', 'show', 'fade-Out', 'fade-In', 'slide-Up', 'slide-Down'];
   easyActions.forEach(function(item, i, arr) {
     $('[data-' + item + ']').each(function(index, el) {
-      var action = item.split('-');
-      if(action[0] == 'hide' || action[0] == 'show')
-        action = 'toggle';
-      else
-        action = action[0] + 'Toggle';
+      if( $(this).data('toggle') == 'false' ){
+        var action = item.replace('-', '');
+      }
+      else {
+        var action = item.split('-');
+        if(action[0] == 'hide' || action[0] == 'show')
+          action = 'toggle';
+        else
+          action = action[0] + 'Toggle';
+      }
 
       doAction( $(this), $(this).data(item), 'change', action );
 
