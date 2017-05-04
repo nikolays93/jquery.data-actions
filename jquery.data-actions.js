@@ -4,27 +4,15 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 1.2b
+ * Version: 1.3b
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
 jQuery(function($){
-  function replaceTextOnly($obj, from, to){
-    var node = $obj.get(0);
-    var childs = node.childNodes;
-    for(var inc = 0; inc < childs.length; inc++) {
-      if(childs[inc].nodeType == 3){ 
-        if(childs[inc].textContent) {
-          childs[inc].textContent = childs[inc].textContent.replace(from, to);
-        } 
-        else {
-         childs[inc].nodeValue = childs[inc].nodeValue.replace(from, to);
-        }
-      }
-    }
-  }
-
+	//
+	// Core функции data-действия
+	//
   function doLoadAction($obj, target, action){
     var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
     var props = $obj.data('props');
@@ -61,22 +49,29 @@ jQuery(function($){
     });
   }
 
+  function setTarget(){
+
+  }
+
+  // [data-target="#selector"] указывает на объект над которым нужно производить действия
   $('[data-target]').each(function(index, el) {
-    $this = $(el);
-    var target  = $this.data('target');
-    var trigger = $this.data('trigger');
+    var trigger = $(this).data('trigger');
     if( ! trigger ) trigger = 'click';
     
-    doAction( $this, target, trigger );
+    doAction( $(this), $(this).data('target'), trigger );
     $(this).children('[data-action]').each(function(){
-      doAction( $(this), target, trigger );
+      doAction( $(this), $(el).data('target'), trigger );
     });
   });
 
+  //
+  // Простые действия (target пишется в аттрибут действия)[data-fade-In="#target"]
+  // если data-toggle !== 'false' повторный клик совершит обратное действие
+  // 
   var easyActions = ['hide', 'show', 'fade-Out', 'fade-In', 'slide-Up', 'slide-Down'];
   easyActions.forEach(function(item, i, arr) {
     $('[data-' + item + ']').each(function(index, el) {
-      if( $(this).data('toggle') == 'false' ){
+      if( $(this).data('toggle') === 'false' ){
         var action = item.replace('-', '');
       }
       else {
@@ -89,44 +84,63 @@ jQuery(function($){
 
       doAction( $(this), $(this).data(item), 'change', action );
 
-      action = item.replace('-', '');
+      if($(this).attr('type') == 'checkbox'){
+      	action = item.replace('-', '');
 
-      if( $(this).attr('type') == 'checkbox' && !$(this).is(':checked')){
-        if( ['show', 'fadeIn', 'slideDown'].includes(action) ){
-          action = action.replace('show', 'hide').replace('In', 'Out').replace('Down', 'Up');
-        }
-        else{
-          action = action.replace('hide', 'show').replace('Out', 'In').replace('Up', 'Down');
-        }
+      	if( !$(this).is(':checked')){
+      		if( ['show', 'fadeIn', 'slideDown'].includes(action) ){
+      			action = action.replace('show', 'hide').replace('In', 'Out').replace('Down', 'Up');
+      		}
+      		else{
+      			action = action.replace('hide', 'show').replace('Out', 'In').replace('Up', 'Down');
+      		}
+      	}
+
+      	doLoadAction( $(this), $(this).data(item), action );
       }
       
-      doLoadAction( $(this), $(this).data(item), action );
     });
   });
 
-  function textRepalce( $obj ){
-    $wasObj = $obj;
-    var textReplace = $obj.attr('data-text-replace');
-    var textReplaceTo = $obj.attr('data-text-replace-to');
-    var target  = $obj.data('target');
+  //
+  // [data-text-replace="Текст"] Полностью изменить текст объекта на указанный в атрибуте
+  // [data-text-replace-to="Тест"] Найти и изменить текст [data-text-replace] на новый
+  // При повторном действии обращает текст обратно.
+  //
+  function replaceTextOnly($obj, from, to){
+    var node = $obj.get(0);
+    var childs = node.childNodes;
+    for(var inc = 0; inc < childs.length; inc++) {
+      if(childs[inc].nodeType == 3){ 
+        if(childs[inc].textContent) {
+          childs[inc].textContent = childs[inc].textContent.replace(from, to);
+        } 
+        else {
+         childs[inc].nodeValue = childs[inc].nodeValue.replace(from, to);
+        }
+      }
+    }
+  }
 
-    if( target )
-      $obj = $( target )
+  function textRepalce( $obj ){
+    var textReplace = $obj.data('text-replace');
+    var textReplaceTo = $obj.data('text-replace-to');
+    var $tObj = $obj.data('target') !== 'this' ? $( $obj.data('target') ) : $(this);
 
     if( textReplace && textReplaceTo ){
-      if( ! $obj.attr('data-text-replaced') ){
-        replaceTextOnly($obj, textReplace, textReplaceTo);
-        $obj.attr('data-text-replaced', 'true');
+      if( ! $tObj.attr('data-text-replaced') ){
+        replaceTextOnly($tObj, textReplace, textReplaceTo);
+        $tObj.attr('data-text-replaced', 'true');
       }
       else {
-        replaceTextOnly($obj, textReplaceTo, textReplace);
-        $obj.removeAttr('data-text-replaced');
+        replaceTextOnly($tObj, textReplaceTo, textReplace);
+        $tObj.removeAttr('data-text-replaced');
       }
     }
     else {
-      var text = $obj.text();
-      $wasObj.attr('data-text-replace', text);
-      $obj.text( textReplace );
+      var text = $tObj.text();
+      $obj.attr('data-text-replace', text);
+      $tObj.text( textReplace );
     }
   }
   
