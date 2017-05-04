@@ -3,102 +3,89 @@
  * Script URI: https://github.com/nikolays93/jquery.data-actions/
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
- * Description: Common jQuery actions.
- * Version: 1.3b
+ * Description: jQuery actions.
+ * Version: 1.4b
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
 
 jQuery(function($){
 	//
-	// Core функции data-действия
+	// Core функции data-действий
 	//
-  function doLoadAction($obj, target, action){
+  function doAction($obj, target, action){
     var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
-    var props = $obj.data('props');
-    eval( '$( ' + evalTarget + ' ).' + action + '(' + props + ');' );
+    eval( '$( ' + evalTarget + ' ).' + action + '(' + $obj.data('props') + ');' );
   }
 
-  function doAction($obj, target, trigger, action ){
-    if(typeof action === 'undefined') action = false;
-    
-    var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
-    var loadAction = (trigger == 'load') ? action : $obj.data('load');
-    if( loadAction )
-      doLoadAction($obj, target, loadAction);
-
+  function setAction($obj, target, trigger, action ){
     $obj.on(trigger, function(event) {
-      var toggleClass = $(this).data('toggle-class');
-      if( toggleClass )
-        $(target).toggleClass(toggleClass);
-      
-      var wrap = $(this).data('wrapper');
-      if( wrap && event.target !== this )
+      if( $(this).data('wrapper') && event.target !== this )
         return;
 
-      var allowClick  = $(this).data('allow-click');
-      if( ! allowClick && trigger == 'click' )
+      if( ! $(this).data('allow-click') && trigger == 'click' )
         event.preventDefault();
 
-      if(!action)
-        action = $obj.data('action');
-
-      var props = $obj.data('props');
-      if( action )
-        eval( '$( ' + evalTarget + ' ).' + action + '(' + props + ');' );
+      if( ! action ) action = $obj.data('action');
+      doAction( $obj, target, action);
     });
   }
 
-  function setTarget(){
-
-  }
-
+  // [data-action="toggle"]
   // [data-target="#selector"] указывает на объект над которым нужно производить действия
-  $('[data-target]').each(function(index, el) {
+  // если не указан - ищет target у родителя. Если цель не будет найдена сработает на самом объекте
+  $('[data-action]').each(function(index, el) {
+    var target = $(this).data('target') ? $(this).data('target') : $(this).closest('[data-target]').data('target');
+    if( ! target ) target = 'this';
+
     var trigger = $(this).data('trigger');
-    if( ! trigger ) trigger = 'click';
-    
-    doAction( $(this), $(this).data('target'), trigger );
-    $(this).children('[data-action]').each(function(){
-      doAction( $(this), $(el).data('target'), trigger );
-    });
+    if( trigger == 'load' ){
+      doAction( $(this), target, $(this).data('action') );
+      return;
+    }
+    else if( ! trigger ){
+      trigger = 'click';
+    }
+
+    setAction( $(this), target, trigger );
   });
 
   //
   // Простые действия (target пишется в аттрибут действия)[data-fade-In="#target"]
   // если data-toggle !== 'false' повторный клик совершит обратное действие
+  // на checkbox'ах и input'ах действует коровья суперсила ;D
   // 
-  var easyActions = ['hide', 'show', 'fade-Out', 'fade-In', 'slide-Up', 'slide-Down'];
+  var easyActions = ['hide', 'show', 'fade-Out', 'fade-In', 'slide-Up', 'slide-Down', 'toggle', 'fade-Toggle', 'slide-Toggle'];
   easyActions.forEach(function(item, i, arr) {
     $('[data-' + item + ']').each(function(index, el) {
-      if( $(this).data('toggle') === 'false' ){
-        var action = item.replace('-', '');
+
+      action = item.replace('-', '');
+      if( $(this).attr('type') == 'checkbox' || $(this).attr('type') == 'radio' ){
+        
+        if($(this).data('toggle') !== 'false'){
+          action = item.split('-')[0];
+          action = (action == 'hide' || action == 'show') ? 'toggle' : action + 'Toggle';
+        }
+
+        var cAction = item.replace('-', '');
+        if( !$(this).is(':checked')){
+          if( ['show', 'fadeIn', 'slideDown'].includes(cAction) ){
+            cAction = cAction.replace('show', 'hide').replace('In', 'Out').replace('Down', 'Up');
+          }
+          else{
+            cAction = cAction.replace('hide', 'show').replace('Out', 'In').replace('Up', 'Down');
+          }
+        }
+
+        doAction( $(this), $(this).data(item), cAction );
+        var trigger = 'change';
+      } else {
+        var trigger = $(this).data('trigger');
+        if( ! trigger ) trigger = 'click';
       }
-      else {
-        var action = item.split('-');
-        if(action[0] == 'hide' || action[0] == 'show')
-          action = 'toggle';
-        else
-          action = action[0] + 'Toggle';
-      }
 
-      doAction( $(this), $(this).data(item), 'change', action );
-
-      if($(this).attr('type') == 'checkbox'){
-      	action = item.replace('-', '');
-
-      	if( !$(this).is(':checked')){
-      		if( ['show', 'fadeIn', 'slideDown'].includes(action) ){
-      			action = action.replace('show', 'hide').replace('In', 'Out').replace('Down', 'Up');
-      		}
-      		else{
-      			action = action.replace('hide', 'show').replace('Out', 'In').replace('Up', 'Down');
-      		}
-      	}
-
-      	doLoadAction( $(this), $(this).data(item), action );
-      }
-      
+      setAction( $(this), $(this).data(item), trigger, action );
+    	
     });
   });
 
@@ -123,24 +110,28 @@ jQuery(function($){
   }
 
   function textRepalce( $obj ){
-    var textReplace = $obj.data('text-replace');
-    var textReplaceTo = $obj.data('text-replace-to');
-    var $tObj = $obj.data('target') !== 'this' ? $( $obj.data('target') ) : $(this);
+    $wasObj = $obj;
+    var textReplace = $obj.attr('data-text-replace');
+    var textReplaceTo = $obj.attr('data-text-replace-to');
+    var target  = $obj.data('target');
+
+    if( target )
+      $obj = $( target )
 
     if( textReplace && textReplaceTo ){
-      if( ! $tObj.attr('data-text-replaced') ){
-        replaceTextOnly($tObj, textReplace, textReplaceTo);
-        $tObj.attr('data-text-replaced', 'true');
+      if( ! $obj.attr('data-text-replaced') ){
+        replaceTextOnly($obj, textReplace, textReplaceTo);
+        $obj.attr('data-text-replaced', 'true');
       }
       else {
-        replaceTextOnly($tObj, textReplaceTo, textReplace);
-        $tObj.removeAttr('data-text-replaced');
+        replaceTextOnly($obj, textReplaceTo, textReplace);
+        $obj.removeAttr('data-text-replaced');
       }
     }
     else {
-      var text = $tObj.text();
-      $obj.attr('data-text-replace', text);
-      $tObj.text( textReplace );
+      var text = $obj.text();
+      $wasObj.attr('data-text-replace', text);
+      $obj.text( textReplace );
     }
   }
   

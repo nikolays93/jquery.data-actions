@@ -5,6 +5,9 @@ div, p {
 	display: inline-block;
 	box-sizing: border-box;
 }
+label {
+	cursor: pointer;
+}
 #wrap {
 	display: block;
 	text-align: center;
@@ -36,7 +39,7 @@ div, p {
 	width: 100px;
 	margin-left: -50px;
 	height: 100px;
-	background: cyan;
+	background: cornsilk;
 	border: 1px solid lightblue;
 	text-align: center;
 	padding: 40px 0;
