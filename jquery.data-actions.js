@@ -4,7 +4,7 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: jQuery actions.
- * Version: 1.4b
+ * Version: 1.5b
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -14,8 +14,33 @@ jQuery(function($){
 	// Core функции data-действий
 	//
   function doAction($obj, target, action){
-    var evalTarget = ( target !== 'this' ) ? "'"+target+"'" : 'this';
-    eval( '$( ' + evalTarget + ' ).' + action + '(' + $obj.data('props') + ');' );
+    if( target === 'this' ){
+      var evalTarget = '$(this)';
+    } else {
+      var evalTarget = "$('"+target+"')";
+
+      var exp = {
+        "> " : "$obj.children('",
+        "< " : "$obj.parent('",
+        ">> " : "$obj.find('",
+        "<< " : "$obj.closest('",
+        "<> " : "$obj.parent().children('",
+        "<<>> " : "$obj.parent().find('"
+      };
+
+      $.each(exp, function(index, value) {
+        var regExp = new RegExp('^('+index+')');
+        if ( target.match(regExp) ){
+          evalTarget = value + target.replace(regExp, '') + "')";
+          
+          //console.log(value + target.replace(regExp, '') + "')");
+        }
+      }); 
+      
+      console.log(evalTarget);
+    }
+
+    eval( evalTarget + '.' + action + '(' + $obj.data('props') + ');' );
   }
 
   function setAction($obj, target, trigger, action ){

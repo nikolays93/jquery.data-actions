@@ -20,6 +20,15 @@
 		<div id="inside" data-text-replace="I said: NO CLICK!"> NO CLICK </div>
 		<div id="inside2" data-action="fadeToggle"> Click Me Please! </div>
 	</div>
+	
+	<div id="wrap">
+		<span data-fade-Toggle="< #wrap">use simple target</span>
+		<div class="test">
+			<div id="inside" data-target="<< #wrap" data-action="animate" data-props="{'margin-left': 5}"> NO CLICK </div>
+			<div id="inside2" data-slide-Toggle="<> #inside"> Toggle near! </div>
+		</div>
+	</div>	
+
 	<hr>
 
 	<!-- simple action -->

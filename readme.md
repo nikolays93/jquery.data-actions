@@ -16,6 +16,7 @@
 - action="toggleClass" ex. toggleClass
 - target="#selector" ex. .selector > div
 - trigger="event" ex. load
+- props - any js props
 
 - text-replace="Текст" Полностью изменить текст объекта на указанный в атрибуте
 - text-replace-to="Текст" - Найти и изменить текст [data-text-replace] на новый
@@ -33,12 +34,11 @@
 - slide-Toggle
 toggle="false" - отключит обратное действие на переключателях
 
-### allows: ###
+### Allows: ###
 - allow-click - отключает e.preventDefault() наложеный на trigger="click"
 - wrapper - клик только по элементу, не влиять на дочерние элементы
 
-### todo: ###
-Добавить вспомогательные селекторы
+### Simple targets: ###
 * \>  = '> sel', this
 * <   = .parent
 * \>> = .find()
