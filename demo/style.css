@@ -20,6 +20,7 @@ hr {
 	background: #ccc;
 	border: 1px solid;
 	line-height: 20px;
+	margin-bottom: 30px;
 }
 #wrap + #wrap {
 	margin-left: 15px;
