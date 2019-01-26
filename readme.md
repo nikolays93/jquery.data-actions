@@ -6,7 +6,6 @@
  * Author: NikolayS93
  * Author URI: //vk.com/nikolays_93
  * Description: Common jQuery actions.
- * Version: 1.4 beta
  * License: GNU General Public License v2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  */
