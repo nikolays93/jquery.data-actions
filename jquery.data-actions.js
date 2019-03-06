@@ -20,19 +20,23 @@ jQuery(document).ready(function($) {
             var evalTarget = "$('"+target+"')";
 
             var exp = {
-                "> " : "$obj.children('",
-                "< " : "$obj.parent('",
-                ">> " : "$obj.find('",
-                "<< " : "$obj.closest('",
-                "<> " : "$obj.parent().children('",
-                "<<>> " : "$obj.parent().find('"
+                "> " : "\$obj.children('",
+                "< " : "\$obj.parent('",
+                ">> " : "\$obj.find('",
+                "<< " : "\$obj.closest('",
+                "<> " : "\$obj.parent().children('",
+                "<>> " : "\$obj.parent().find('",
+                "<<>> " : "\$obj.closest('body, section, .container').find('",
+                "<<([A-Za-z.#]+)>> " : "\$obj.closest('$2').find('"
             };
 
             $.each(exp, function(index, value) {
                 var regExp = new RegExp('^('+index+')');
-                if ( target.match(regExp) )
-                    evalTarget = value + target.replace(regExp, '') + "')";
-            }); 
+
+                if ( target.match(regExp) ) {
+                    evalTarget = target.replace(regExp, value) + "')";
+                }
+            });
         }
 
         var props = ($obj.data('props')) ? $obj.data('props') : '';
@@ -41,11 +45,11 @@ jQuery(document).ready(function($) {
 
     function setAction($obj, target, trigger, action ) {
         $obj.on(trigger, function(event) {
-            if( $(this).data('wrapper') && event.target !== this )
-                return;
+            if( $(this).data('wrapper') && event.target !== this ) return;
 
-            if( ! $(this).data('allow-click') && trigger == 'click' )
+            if( ! $(this).data('allow-click') && 'click' == trigger ) {
                 event.preventDefault();
+            }
 
             if( ! action ) action = $obj.data('action');
             doAction( $obj, target, action);
@@ -116,10 +120,9 @@ jQuery(document).ready(function($) {
         var $self = $obj,
             textReplace = $obj.data('text-replace'),
             textReplaceTo = $obj.data('text-replace-to'),
-            target  = $obj.data('target');
+            target  = $obj.data('text-target');
 
-        if( target ) $target = $( target );
-        if( !$target.length ) return;
+        var $target = target ? $( target ) : $self;
 
         // text selection
         if( textReplace && textReplaceTo ) {
@@ -149,6 +152,10 @@ jQuery(document).ready(function($) {
         }
         else {
             $(this).on(trigger, function() {
+                if( ! $(this).data('allow-click') && 'click' == trigger ) {
+                    event.preventDefault();
+                }
+
                 textRepalce( $(this) );
             });
         }

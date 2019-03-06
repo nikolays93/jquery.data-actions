@@ -25,12 +25,13 @@
 - hide
 - show
 - toggle
-- fade-In
-- fade-Out
-- fade-Toggle
-- slide-In
-- slide-Out
-- slide-Toggle
+- fade-in
+- fade-out
+- fade-toggle
+- slide-in
+- slide-out
+- slide-toggle
+
 toggle="false" - отключит обратное действие на переключателях
 
 ### Allows: ###
@@ -38,9 +39,11 @@ toggle="false" - отключит обратное действие на пер�
 - wrapper - клик только по элементу, не влиять на дочерние элементы
 
 ### Simple targets: ###
-* \>  = .children()
-* <   = .parent()
-* \>> = .find()
-* <<  = .closest()
-* <>  = .parent().children()
-* <<>>= .parent().find()
+* \>  = ```.children()```
+* <   = ```.parent()```
+* \>> = ```.find()```
+* <<  = ```.closest()```
+* <>  = ```.parent().children()```
+* <>> = ```.parent().find()```
+* <<>> = ```.closest('body, section, .container').find()```
+* <<#target>> = ```.closest(#target).find()```
